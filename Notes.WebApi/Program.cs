@@ -1,15 +1,35 @@
+using Notes.Persistence;
+
 namespace Notes.WebApi
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
-            var app = builder.Build();
+            var host = CreateHostBuilder(args).Build();
 
-            app.MapGet("/", () => "Hello World!");
+            using(var scope = host.Services.CreateScope())
+            {
+                var serviceProvider = scope.ServiceProvider;
+                try
+                {
+                    var context = serviceProvider.GetRequiredService<NotesDbContext>();
+                    DbInitializer.Initialize(context);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Catch ex
+                }
+            }
 
-            app.Run();
+            host.Run();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
     }
 }
