@@ -10,6 +10,7 @@ using NotesApplication.Notes.Queries.GetNotesList;
 
 namespace Notes.WebApi.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class NoteController : BaseController
     {
@@ -17,8 +18,20 @@ namespace Notes.WebApi.Controllers
 
         public NoteController(IMapper mapper) => _mapper = mapper;
 
+        /// <summary>
+        /// Gets the list of notes
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// GET /note
+        /// </remarks>
+        /// <returns>Returns NoteListVm</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If user is unathorized</response>
         [HttpGet]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<NoteListVm>> GetAll()
         {
             var query = new GetNoteListQuery()
